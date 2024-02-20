@@ -23,8 +23,6 @@ export class UserService {
     const createUserObj = {
       ...createUserDto,
       password: hashedPassword,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
     return this.prisma.user.create({ data: createUserObj });
   }

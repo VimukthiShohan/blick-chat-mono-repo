@@ -6,21 +6,29 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { UpdateConversationDto } from './dto/update-conversation.dto';
+import { ConversationDto, UpdateConversationDto } from './dto/conversation.dto';
+import { ReqWithUser } from '../../utils/interfaces/reqWithUser';
+import { AuthGuard } from '../user/guards/jwt-auth.guard';
 
 @Controller('conversation')
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
 
-  @Post()
-  create(@Body() createConversationDto: CreateConversationDto) {
-    return this.conversationService.create(createConversationDto);
+  @Post('/create')
+  @UseGuards(AuthGuard)
+  create(
+    @Body() createConversationDto: ConversationDto,
+    @Req() request: ReqWithUser,
+  ) {
+    return this.conversationService.create(createConversationDto, request.user);
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   findAll() {
     return this.conversationService.findAll();
   }
