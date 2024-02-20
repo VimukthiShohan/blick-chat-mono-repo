@@ -39,7 +39,12 @@ export class UserService {
     }
 
     if (await bcrypt.compare(loginUserDto.password, user.password)) {
-      return user;
+      const userDetails = { email: loginUserDto.email };
+      const accessToken = jwt.sign(
+        userDetails,
+        process.env.ACCESS_TOKEN_SECRET,
+      );
+      return { ...user, accessToken };
     } else {
       throw new BadRequestException(USER_MESSAGE.INCORRECT_PASSWORD);
     }
