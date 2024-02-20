@@ -2,6 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto/user.dto';
 import { PrismaService } from 'nestjs-prisma';
 import * as bcrypt from 'bcrypt';
+import { USER_MESSAGE } from '../../utils/responseMessages';
+
+const jwt = require('jsonwebtoken');
 
 const PASSWORD_GEN_SALT_COUNT = 12;
 
@@ -26,6 +29,20 @@ export class UserService {
       updatedAt: new Date(),
     };
     return this.prisma.user.create({ data: createUserObj });
+  }
+
+  async login(loginUserDto: LoginUserDto) {
+    const user = await this.findOne(loginUserDto.email);
+
+    if (!user) {
+      throw new BadRequestException(USER_MESSAGE.NOT_FOUND);
+    }
+
+    if (await bcrypt.compare(loginUserDto.password, user.password)) {
+      return user;
+    } else {
+      throw new BadRequestException(USER_MESSAGE.INCORRECT_PASSWORD);
+    }
   }
 
   findAll() {
