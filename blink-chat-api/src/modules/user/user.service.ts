@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto/user.dto';
 import { PrismaService } from 'nestjs-prisma';
 import * as bcrypt from 'bcrypt';
 
@@ -10,6 +9,12 @@ const PASSWORD_GEN_SALT_COUNT = 12;
 export class UserService {
   constructor(private prisma: PrismaService) {}
   async create(createUserDto: CreateUserDto) {
+    const foundUserByEmail = await this.findOne(createUserDto.email);
+
+    if (foundUserByEmail) {
+      throw new BadRequestException(USER_MESSAGE.USER_EXISTS);
+    }
+
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       PASSWORD_GEN_SALT_COUNT,
