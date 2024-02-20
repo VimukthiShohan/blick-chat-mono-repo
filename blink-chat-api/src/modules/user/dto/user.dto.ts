@@ -1,4 +1,4 @@
-import { PartialType, PickType } from '@nestjs/mapped-types';
+import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateUserDto {
   email: string;
@@ -11,8 +11,3 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
-
-export class LoginUserDto extends PickType(CreateUserDto, [
-  'email',
-  'password',
-]) {}
