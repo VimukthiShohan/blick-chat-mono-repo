@@ -37,11 +37,23 @@ export class UserService {
     return this.prisma.user.findFirst({ where: { email } });
   }
 
-  update(email: string, updateUserDto: UpdateUserDto) {
+  async update(email: string, updateUserDto: UpdateUserDto) {
+    const user = await this.findOne(email);
+
+    if (!user) {
+      throw new BadRequestException(USER_MESSAGE.NOT_FOUND);
+    }
+
     return this.prisma.user.update({ where: { email }, data: updateUserDto });
   }
 
-  remove(email: string) {
+  async remove(email: string) {
+    const user = await this.findOne(email);
+
+    if (!user) {
+      throw new BadRequestException(USER_MESSAGE.NOT_FOUND);
+    }
+
     return this.prisma.user.delete({ where: { email } });
   }
 }
