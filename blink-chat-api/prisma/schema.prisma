@@ -14,18 +14,18 @@ model User {
   email            String             @id
   firstName        String
   lastName         String
-  profilePic       String
+  profilePic       String?
   password         String
-  createdAt        String
-  updatedAt        String
+  createdAt        DateTime
+  updatedAt        DateTime
   UserConversation UserConversation[]
   Message          Message[]
 }
 
 model Conversation {
   id               String             @id @default(uuid())
-  createdAt        String
-  updatedAt        String
+  createdAt        DateTime
+  updatedAt        DateTime
   UserConversation UserConversation[]
   Message          Message[]
 }
@@ -33,8 +33,8 @@ model Conversation {
 model Message {
   id             String       @id @default(uuid())
   msg            String
-  createdAt      String
-  updatedAt      String
+  createdAt      DateTime
+  updatedAt      DateTime
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   conversationId String
   user           User         @relation(fields: [userEmail], references: [email])

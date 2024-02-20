@@ -2,12 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'nestjs-prisma';
+import * as bcrypt from 'bcrypt';
+
+const PASSWORD_GEN_SALT_COUNT = 12;
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
-  create(createUserDto: CreateUserDto) {
-    return this.prisma.user.create({ data: createUserDto });
+  async create(createUserDto: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      PASSWORD_GEN_SALT_COUNT,
+    );
+    const createUserObj = {
+      ...createUserDto,
+      password: hashedPassword,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    return this.prisma.user.create({ data: createUserObj });
   }
 
   findAll() {
