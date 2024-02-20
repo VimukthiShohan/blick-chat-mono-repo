@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConversationDto, UpdateConversationDto } from './dto/conversation.dto';
+import { ConversationDto, MessageDto } from './dto/conversation.dto';
 import { PrismaService } from 'nestjs-prisma';
 import { User } from '@prisma/client';
 
@@ -31,14 +31,29 @@ export class ConversationService {
     return this.prisma.conversation.findFirst({ where: { id } });
   }
 
-  update(id: string, updateConversationDto: UpdateConversationDto) {
-    return this.prisma.conversation.update({
-      where: { id },
-      data: updateConversationDto,
+  remove(id: string) {
+    return this.prisma.conversation.delete({ where: { id } });
+  }
+
+  findAllConversationMessages(id: string) {
+    return this.prisma.message.findMany({ where: { conversationId: id } });
+  }
+
+  createConversationMessage(
+    id: string,
+    createMessageDto: MessageDto,
+    user: User,
+  ) {
+    return this.prisma.message.create({
+      data: {
+        msg: createMessageDto.msg,
+        conversationId: id,
+        userEmail: user.email,
+      },
     });
   }
 
-  remove(id: string) {
-    return this.prisma.conversation.delete({ where: { id } });
+  removeConversationMessage(id: string) {
+    return this.prisma.message.delete({ where: { id } });
   }
 }

@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
-import { ConversationDto } from './dto/conversation.dto';
+import { ConversationDto, MessageDto } from './dto/conversation.dto';
 import { ReqWithUser } from '../../utils/interfaces/reqWithUser';
 import { AuthGuard } from '../user/guards/jwt-auth.guard';
 
@@ -42,5 +42,31 @@ export class ConversationController {
   @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.conversationService.remove(id);
+  }
+
+  @Get('/messages/:id')
+  @UseGuards(AuthGuard)
+  findAllConversationMessages(@Param('id') id: string) {
+    return this.conversationService.findAllConversationMessages(id);
+  }
+
+  @Post('/messages/create/:id')
+  @UseGuards(AuthGuard)
+  createConversationMessage(
+    @Param('id') id: string,
+    @Body() createMessageDto: MessageDto,
+    @Req() request: ReqWithUser,
+  ) {
+    return this.conversationService.createConversationMessage(
+      id,
+      createMessageDto,
+      request.user,
+    );
+  }
+
+  @Delete('/messages/:id')
+  @UseGuards(AuthGuard)
+  removeConversationMessage(@Param('id') id: string) {
+    return this.conversationService.removeConversationMessage(id);
   }
 }
