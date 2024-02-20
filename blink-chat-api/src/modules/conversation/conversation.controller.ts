@@ -3,14 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
-import { ConversationDto, UpdateConversationDto } from './dto/conversation.dto';
+import { ConversationDto } from './dto/conversation.dto';
 import { ReqWithUser } from '../../utils/interfaces/reqWithUser';
 import { AuthGuard } from '../user/guards/jwt-auth.guard';
 
@@ -34,19 +33,13 @@ export class ConversationController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   findOne(@Param('id') id: string) {
     return this.conversationService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateConversationDto: UpdateConversationDto,
-  ) {
-    return this.conversationService.update(id, updateConversationDto);
-  }
-
   @Delete(':id')
+  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.conversationService.remove(id);
   }
