@@ -7,12 +7,10 @@ export const metadata: Metadata = {
   description: 'Edu grade login page',
 };
 
-const SignUp = () => {
-  return (
-    <AuthLayout>
-      <SignUpForm />
-    </AuthLayout>
-  );
-};
+const SignUpPage = () => (
+  <AuthLayout>
+    <SignUpForm />
+  </AuthLayout>
+);
 
-export default SignUp;
+export default SignUpPage;
