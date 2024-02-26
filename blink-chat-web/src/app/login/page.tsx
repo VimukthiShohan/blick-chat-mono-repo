@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import AuthLayout from '@/components/common/AuthLayout';
 import LoginForm from '@/app/login/loginForm';
+import AuthLayout from '@/components/common/AuthLayout';
 
 export const metadata: Metadata = {
   title: 'Login - Edu Grade',

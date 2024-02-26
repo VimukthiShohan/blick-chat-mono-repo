@@ -1,9 +1,11 @@
 'use client';
 
 import { FC } from 'react';
-import { Button, TextField } from '@mui/material';
+import NextLink from 'next/link';
+import { Button, Link, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
 import { VALIDATION_MSG } from '@/config/responseMessage';
 
 const validationSchema = Yup.object({
@@ -52,9 +54,15 @@ const LoginForm: FC = () => {
         error={formik.touched.password && Boolean(formik.errors.password)}
         helperText={formik.touched.password && formik.errors.password}
       />
-      <Button type="submit" variant="contained" color="primary">
-        Login
-      </Button>
+
+      <div className="flex justify-between">
+        <Button type="submit" variant="contained" color="primary">
+          Login
+        </Button>
+        <NextLink href="/signup" passHref>
+          <Link color="primary">Don't have an account? SignUp</Link>
+        </NextLink>
+      </div>
     </form>
   );
 };
