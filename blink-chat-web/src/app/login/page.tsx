@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import FormsContainer from './formsContainer';
+import AuthLayout from '@/components/common/AuthLayout';
+import LoginForm from '@/app/login/loginForm';
 
 export const metadata: Metadata = {
   title: 'Login - Edu Grade',
@@ -8,10 +9,9 @@ export const metadata: Metadata = {
 
 const Login = () => {
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <FormsContainer />
-      <div className="w-1/3 bg-blue-700"></div>
-    </div>
+    <AuthLayout>
+      <LoginForm />
+    </AuthLayout>
   );
 };
 

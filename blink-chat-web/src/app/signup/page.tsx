@@ -1,18 +1,18 @@
 import { Metadata } from 'next';
-import FormsContainer from './formsContainer';
+import AuthLayout from '@/components/common/AuthLayout';
+import SignUpForm from '@/app/signup/signUpForm';
 
 export const metadata: Metadata = {
-  title: 'Login - Edu Grade',
+  title: 'SignUp - Edu Grade',
   description: 'Edu grade login page',
 };
 
-const Login = () => {
+const SignUp = () => {
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <FormsContainer />
-      <div className="w-1/3 bg-blue-700"></div>
-    </div>
+    <AuthLayout>
+      <SignUpForm />
+    </AuthLayout>
   );
 };
 
-export default Login;
+export default SignUp;
