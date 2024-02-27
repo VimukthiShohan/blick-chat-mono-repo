@@ -2,11 +2,16 @@
 
 import { FC } from 'react';
 import NextLink from 'next/link';
-import { Button, Link, TextField } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { Link, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
+import { useLogin } from '@/api/auth';
+import { useSnack } from '@/utils/useSnack';
+import LoadingButton from '@/components/LoadingButton';
 import { VALIDATION_MSG } from '@/config/responseMessage';
+import { saveTokenInLocal, saveUser } from '@/utils/cacheStorage';
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -16,6 +21,19 @@ const validationSchema = Yup.object({
 });
 
 const LoginForm: FC = () => {
+  const router = useRouter();
+  const { showErrSnack } = useSnack();
+
+  const { isLoading, mutate } = useLogin({
+    onSuccess: (data) => {
+      const { accessToken, ...rest } = data;
+      saveTokenInLocal(accessToken);
+      saveUser(rest);
+      router.push('/messenger');
+    },
+    onError: (err) => showErrSnack(err),
+  });
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -23,7 +41,7 @@ const LoginForm: FC = () => {
     },
     validationSchema,
     onSubmit: (values) => {
-      console.log('Form data', values);
+      mutate(values);
     },
   });
 
@@ -56,9 +74,14 @@ const LoginForm: FC = () => {
       />
 
       <div className="flex justify-between">
-        <Button type="submit" variant="contained" color="primary">
+        <LoadingButton
+          type="submit"
+          variant="contained"
+          color="primary"
+          loading={isLoading}
+        >
           Login
-        </Button>
+        </LoadingButton>
         <NextLink href="/signup" passHref>
           <Link color="primary">Don't have an account? SignUp</Link>
         </NextLink>
