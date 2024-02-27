@@ -1,5 +1,6 @@
 import React from 'react';
-import { Paper, Typography, Avatar } from '@mui/material';
+import { Paper, Typography, Avatar, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface ConversationProps {
   profilePic: string;
@@ -14,11 +15,20 @@ const Conversation: React.FC<ConversationProps> = ({
 }) => {
   return (
     <Paper variant="outlined">
-      <Avatar src={profilePic} alt={profileName} />
-      <Typography variant="h5">{profileName}</Typography>
-      <Typography variant="subtitle1">
-        {online ? 'Online' : 'Offline'}
-      </Typography>
+      <div className="flex m-2 justify-between">
+        <div className="flex flex-row">
+          <Avatar src={profilePic} alt={profileName} className="mt-1" />
+          <div className="flex flex-col ml-2">
+            <Typography variant="h5">{profileName}</Typography>
+            <Typography variant="caption">
+              {online ? 'Online' : 'Offline'}
+            </Typography>
+          </div>
+        </div>
+        <IconButton>
+          <CloseIcon />
+        </IconButton>
+      </div>
       {/* Add conversation content here */}
     </Paper>
   );
