@@ -3,12 +3,16 @@ import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { PrismaService } from 'nestjs-prisma';
 import * as bcrypt from 'bcrypt';
 import { USER_MESSAGE } from '../../utils/responseMessages';
+import { JwtService } from '@nestjs/jwt';
 
 const PASSWORD_GEN_SALT_COUNT = 12;
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
   async create(createUserDto: CreateUserDto) {
     const foundUserByEmail = await this.findOne(createUserDto.email);
 
@@ -24,7 +28,16 @@ export class UserService {
       ...createUserDto,
       password: hashedPassword,
     };
-    return this.prisma.user.create({ data: createUserObj });
+    const createdUserObj = await this.prisma.user.create({
+      data: createUserObj,
+    });
+
+    const userDetails = {
+      email: createdUserObj.email,
+      name: `${createdUserObj.firstName} ${createdUserObj.lastName}`,
+    };
+    const accessToken = await this.jwtService.signAsync(userDetails);
+    return { ...createdUserObj, accessToken };
   }
 
   findAll() {

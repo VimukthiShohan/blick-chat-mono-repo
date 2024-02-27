@@ -2,11 +2,16 @@
 
 import { FC } from 'react';
 import NextLink from 'next/link';
-import { Button, TextField, Link } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { TextField, Link } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
+import { useRegister } from '@/api/user';
+import { useSnack } from '@/utils/useSnack';
 import { VALIDATION_MSG } from '@/config/responseMessage';
+import { saveTokenInLocal, saveUser } from '@/utils/cacheStorage';
+import LoadingButton from '@/components/LoadingButton';
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required(VALIDATION_MSG.F_NAME_REQ),
@@ -18,6 +23,19 @@ const validationSchema = Yup.object({
 });
 
 const SignUpForm: FC = () => {
+  const router = useRouter();
+  const { showErrSnack } = useSnack();
+
+  const { isLoading, mutate } = useRegister({
+    onSuccess: (data) => {
+      const { accessToken, ...rest } = data;
+      saveTokenInLocal(accessToken);
+      saveUser(rest);
+      router.push('/messenger');
+    },
+    onError: (err) => showErrSnack(err),
+  });
+
   const formik = useFormik({
     initialValues: {
       firstName: '',
@@ -27,7 +45,7 @@ const SignUpForm: FC = () => {
     },
     validationSchema,
     onSubmit: (values) => {
-      console.log('Form data', values);
+      mutate(values);
     },
   });
 
@@ -83,9 +101,14 @@ const SignUpForm: FC = () => {
         helperText={formik.touched.password && formik.errors.password}
       />
       <div className="flex justify-between">
-        <Button type="submit" variant="contained" color="primary">
+        <LoadingButton
+          type="submit"
+          variant="contained"
+          color="primary"
+          loading={isLoading}
+        >
           Sign Up
-        </Button>
+        </LoadingButton>
         <NextLink href="/login" passHref>
           <Link color="primary">Already have an account? Login</Link>
         </NextLink>
