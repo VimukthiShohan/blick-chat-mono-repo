@@ -26,7 +26,7 @@ const Conversation: React.FC<ConversationProps> = ({
           </div>
         </div>
         <IconButton>
-          <CloseIcon />
+          <CloseIcon fontSize={'medium'} />
         </IconButton>
       </div>
       {/* Add conversation content here */}
