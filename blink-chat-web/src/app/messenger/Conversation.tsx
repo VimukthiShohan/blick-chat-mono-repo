@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Paper,
   Typography,
@@ -12,10 +12,16 @@ import clsx from 'clsx';
 
 import { useGetUser } from '@/api/user';
 import { User } from '@/types/user.types';
+import useSocket from '@/utils/useSocket';
 import { Nullable } from '@/api/apiService';
+import { SOCKET_EVENTS } from '@/config/constant';
 import ProfileModal from '@/components/ProfileModal';
-import { ConversationResponse } from '@/types/conversation.types';
 import { useGetConversationMessages, useSendMessage } from '@/api/coversation';
+import {
+  ConversationMessagesResponse,
+  ConversationResponse,
+  SocketNewMessageData,
+} from '@/types/conversation.types';
 
 interface ConversationProps {
   selectedConversation: Nullable<ConversationResponse>;
@@ -28,8 +34,10 @@ const Conversation: React.FC<ConversationProps> = ({
   closeConversation,
   currentUser,
 }) => {
+  const { socket } = useSocket();
+
   const { data: userData } = useGetUser(selectedConversation?.userEmail || '');
-  const { data: conversationData, refetch } = useGetConversationMessages(
+  const { data, refetch } = useGetConversationMessages(
     selectedConversation?.conversationId || '',
   );
   const { mutate } = useSendMessage({
@@ -41,6 +49,41 @@ const Conversation: React.FC<ConversationProps> = ({
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [msg, setMsg] = useState('');
+  const [conversationData, setConversationData] = useState<
+    Array<ConversationMessagesResponse>
+  >([]);
+
+  useEffect(() => {
+    setConversationData(data || []);
+  }, [data]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on(
+        SOCKET_EVENTS.NEW_MESSAGE,
+        (socketData: SocketNewMessageData) => {
+          const { receiverEmail, msg, sentUserEmail } = socketData;
+          if (receiverEmail === currentUser.email) {
+            setConversationData((prevState) => [
+              ...prevState,
+              {
+                msg,
+                conversationId: selectedConversation?.conversationId || '',
+                userEmail: sentUserEmail,
+                id: new Date(Date.now()).toString(),
+              },
+            ]);
+          }
+        },
+      );
+    }
+
+    return () => {
+      if (socket) {
+        socket.off(SOCKET_EVENTS.NEW_MESSAGE);
+      }
+    };
+  }, [socket]);
 
   const handleOpenProfileModal = () => {
     setIsProfileModalOpen(true);

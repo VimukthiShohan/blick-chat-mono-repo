@@ -91,7 +91,11 @@ export class ConversationService {
       (item) => item.userEmail !== user.email,
     );
     const otherUserEmail = filteredResult.map((item) => item.userEmail);
-    this.server.emit(SOCKET_EVENTS.NEW_MESSAGE, otherUserEmail[0]);
+    this.server.emit(SOCKET_EVENTS.NEW_MESSAGE, {
+      receiverEmail: otherUserEmail[0],
+      msg: messageDto.msg,
+      sentUserEmail: user.email,
+    });
 
     return this.prisma.message.create({
       data: {
