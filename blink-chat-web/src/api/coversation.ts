@@ -1,7 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { ApiServiceErr, axiosApi } from '@/api/apiService';
+import { ApiServiceErr, axiosApi, MutOptions } from '@/api/apiService';
 import {
+  ConversationMessageBody,
+  ConversationMessageResponse,
   ConversationMessagesResponse,
   ConversationResponse,
 } from '@/types/conversation.types';
@@ -25,3 +27,17 @@ export const useGetConversationMessages = (conversationId: string) =>
       return response.data;
     },
   );
+
+export const useSendMessage = (opt?: MutOptions<ConversationMessageResponse>) =>
+  useMutation<
+    ConversationMessageResponse,
+    ApiServiceErr,
+    ConversationMessageBody
+  >(async (data) => {
+    const { conversationId, msg } = data;
+    const response = await axiosApi.post(
+      `/conversation/messages/create/${conversationId}`,
+      { msg },
+    );
+    return response.data;
+  }, opt);

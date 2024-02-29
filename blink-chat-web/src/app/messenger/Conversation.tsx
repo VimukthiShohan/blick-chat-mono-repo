@@ -15,7 +15,7 @@ import { User } from '@/types/user.types';
 import { Nullable } from '@/api/apiService';
 import ProfileModal from '@/components/ProfileModal';
 import { ConversationResponse } from '@/types/conversation.types';
-import { useGetConversationMessages } from '@/api/coversation';
+import { useGetConversationMessages, useSendMessage } from '@/api/coversation';
 
 interface ConversationProps {
   selectedConversation: Nullable<ConversationResponse>;
@@ -29,11 +29,18 @@ const Conversation: React.FC<ConversationProps> = ({
   currentUser,
 }) => {
   const { data: userData } = useGetUser(selectedConversation?.userEmail || '');
-  const { data: conversationData } = useGetConversationMessages(
+  const { data: conversationData, refetch } = useGetConversationMessages(
     selectedConversation?.conversationId || '',
   );
+  const { mutate } = useSendMessage({
+    onSuccess: () => {
+      setMsg('');
+      refetch();
+    },
+  });
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [msg, setMsg] = useState('');
 
   const handleOpenProfileModal = () => {
     setIsProfileModalOpen(true);
@@ -47,7 +54,7 @@ const Conversation: React.FC<ConversationProps> = ({
     <Paper variant="outlined" className="h-screen flex flex-col">
       {selectedConversation ? (
         <>
-          <div className="flex m-2 justify-between">
+          <div className="flex p-2 justify-between bg-blue-500">
             <div className="flex flex-row">
               <Avatar
                 src={selectedConversation.profilePic}
@@ -108,10 +115,19 @@ const Conversation: React.FC<ConversationProps> = ({
                 variant="outlined"
                 fullWidth
                 label="Type your message"
+                value={msg}
+                onChange={(event) => setMsg(event.target.value)}
               />
             </div>
             <div className="w-1/12 flex justify-center pb-2">
-              <IconButton>
+              <IconButton
+                onClick={() =>
+                  mutate({
+                    conversationId: selectedConversation.conversationId,
+                    msg,
+                  })
+                }
+              >
                 <SendIcon className="text-blue-500" fontSize={'large'} />
               </IconButton>
             </div>
