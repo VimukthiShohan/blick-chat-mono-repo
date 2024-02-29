@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Paper, InputBase, IconButton, Avatar } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
+import { useQueryClient } from '@tanstack/react-query';
 
 import ChatList from './ChatList';
 import Conversation from './Conversation';
+import { Nullable } from '@/api/apiService';
 import { getUser } from '@/utils/cacheStorage';
 import ProfileModal from '@/components/ProfileModal';
-import { useRouter } from 'next/navigation';
+import { ConversationResponse } from '@/types/conversation.types';
 
 const MessengerPage = () => {
   const router = useRouter();
@@ -19,6 +21,8 @@ const MessengerPage = () => {
   const queryClient = useQueryClient();
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [selectedConversation, setSelectedConversation] =
+    useState<Nullable<ConversationResponse>>(null);
 
   const handleOpenProfileModal = () => {
     setIsProfileModalOpen(true);
@@ -56,7 +60,13 @@ const MessengerPage = () => {
               <SearchIcon />
             </IconButton>
           </Paper>
-          <ChatList />
+
+          <ChatList
+            setSelectedConversation={(conversation) =>
+              setSelectedConversation(conversation)
+            }
+            unselectConversation={selectedConversation}
+          />
           <div className="bottom-4 absolute right-4">
             <IconButton>
               <AddCircleRoundedIcon
@@ -67,15 +77,16 @@ const MessengerPage = () => {
           </div>
         </div>
       </div>
+
       <div className="w-2/3 bg-white">
         <Paper className="h-full">
           <Conversation
-            online={true}
-            profileName={'Vimukthi'}
-            profilePic={''}
+            selectedConversation={selectedConversation}
+            closeConversation={() => setSelectedConversation(null)}
           />
         </Paper>
       </div>
+
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={handleCloseProfileModal}

@@ -10,9 +10,19 @@ import {
   Typography,
 } from '@mui/material';
 
+import { Nullable } from '@/api/apiService';
 import { useGetConversations } from '@/api/coversation';
+import { ConversationResponse } from '@/types/conversation.types';
 
-const ChatList = () => {
+interface ChatListProps {
+  setSelectedConversation: (chat: ConversationResponse) => void;
+  unselectConversation: Nullable<ConversationResponse>;
+}
+
+const ChatList: React.FC<ChatListProps> = ({
+  setSelectedConversation,
+  unselectConversation,
+}) => {
   const { data: chatListData } = useGetConversations();
 
   return (
@@ -23,7 +33,13 @@ const ChatList = () => {
         </div>
       ) : (
         chatListData?.map((chat) => (
-          <ListItem key={chat.conversationId}>
+          <ListItem
+            key={chat.conversationId}
+            onClick={() => {
+              setSelectedConversation(chat);
+            }}
+            className={`bg-${unselectConversation?.conversationId === chat.conversationId ? 'gray-400' : 'white'} border-b border-gray-300`}
+          >
             <ListItemAvatar>
               <Avatar />
             </ListItemAvatar>

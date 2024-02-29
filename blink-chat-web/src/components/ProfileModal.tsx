@@ -39,13 +39,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [profilePicture, setProfilePicture] = useState(user.profilePic);
+  const [profilePicture, setProfilePicture] = useState(user?.profilePic);
 
   const formik = useFormik({
     initialValues: {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+      email: user?.email,
     },
     validationSchema,
     onSubmit: (values) => {
@@ -69,7 +69,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         <form className="space-y-6" onSubmit={formik.handleSubmit}>
           <div className="mb-4 flex justify-center items-center flex-col">
             <Avatar
-              alt={user.firstName}
+              alt={user?.firstName}
               src={profilePicture}
               sx={{ width: 120, height: 120, mb: 2 }}
             />
@@ -120,7 +120,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             />
           </div>
           <div className="mb-4">
-            <TextField label="Email" value={user.email} disabled fullWidth />
+            <TextField label="Email" value={user?.email} disabled fullWidth />
           </div>
           <div className="flex justify-end">
             <Button onClick={() => setIsEditing(!isEditing)}>
