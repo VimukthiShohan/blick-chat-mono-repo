@@ -1,18 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import ChatList from './ChatList';
-import Conversation from './Conversation';
 import { Paper, InputBase, IconButton, Avatar } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
+import { useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
+import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 
+import ChatList from './ChatList';
+import Conversation from './Conversation';
 import { getUser } from '@/utils/cacheStorage';
 import ProfileModal from '@/components/ProfileModal';
+import { useRouter } from 'next/navigation';
 
 const MessengerPage = () => {
+  const router = useRouter();
   const currentUser = getUser();
+  const queryClient = useQueryClient();
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -24,13 +28,20 @@ const MessengerPage = () => {
     setIsProfileModalOpen(false);
   };
 
+  const logout = () => {
+    localStorage.clear();
+    queryClient.clear();
+    queryClient.resetQueries();
+    router.push('/login');
+  };
+
   return (
     <div className="flex h-screen">
       <div className="w-1/3 bg-gray-200 flex">
         <Paper className="w-20 px-4 py-2 border-b border-gray-300 flex">
           <div className="flex justify-between items-center flex-col">
             <Avatar className="mt-2" onClick={handleOpenProfileModal} />
-            <IconButton>
+            <IconButton onClick={logout}>
               <LogoutIcon />
             </IconButton>
           </div>
