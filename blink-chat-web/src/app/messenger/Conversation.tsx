@@ -11,20 +11,27 @@ import CloseIcon from '@mui/icons-material/Close';
 import clsx from 'clsx';
 
 import { useGetUser } from '@/api/user';
+import { User } from '@/types/user.types';
 import { Nullable } from '@/api/apiService';
 import ProfileModal from '@/components/ProfileModal';
 import { ConversationResponse } from '@/types/conversation.types';
+import { useGetConversationMessages } from '@/api/coversation';
 
 interface ConversationProps {
   selectedConversation: Nullable<ConversationResponse>;
   closeConversation: (p: null) => void;
+  currentUser: User;
 }
 
 const Conversation: React.FC<ConversationProps> = ({
   selectedConversation,
   closeConversation,
+  currentUser,
 }) => {
   const { data: userData } = useGetUser(selectedConversation?.userEmail || '');
+  const { data: conversationData } = useGetConversationMessages(
+    selectedConversation?.conversationId || '',
+  );
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -35,39 +42,6 @@ const Conversation: React.FC<ConversationProps> = ({
   const handleCloseProfileModal = () => {
     setIsProfileModalOpen(false);
   };
-  const messages = [
-    { text: 'Hello!', isUser: false },
-    { text: 'Hi there!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    { text: 'How are you?', isUser: false },
-    { text: 'I am good, thanks!', isUser: true },
-    // Add more messages as needed
-  ];
 
   return (
     <Paper variant="outlined" className="h-screen flex flex-col">
@@ -104,23 +78,25 @@ const Conversation: React.FC<ConversationProps> = ({
               flexDirection: 'column-reverse',
             }}
           >
-            {messages
-              .slice(0)
-              .reverse()
-              .map((msg, index) => (
-                <Paper
-                  key={index}
-                  elevation={3}
-                  className={clsx(
-                    'p-2 m-2 max-w-[100%]',
-                    msg.isUser
-                      ? 'bg-blue-500 text-white text-right'
-                      : 'bg-gray-200 text-left',
-                  )}
-                >
-                  {msg.text}
-                </Paper>
-              ))}
+            {!conversationData || conversationData?.length === 0
+              ? null
+              : conversationData
+                  .slice(0)
+                  .reverse()
+                  .map((msgObj, index) => (
+                    <Paper
+                      key={index}
+                      elevation={3}
+                      className={clsx(
+                        'p-2 m-2 max-w-[100%]',
+                        msgObj.userEmail === currentUser.email
+                          ? 'bg-blue-500 text-white text-right'
+                          : 'bg-gray-200 text-left',
+                      )}
+                    >
+                      {msgObj.msg}
+                    </Paper>
+                  ))}
           </div>
 
           <div

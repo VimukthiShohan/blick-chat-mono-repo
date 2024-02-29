@@ -83,6 +83,7 @@ const MessengerPage = () => {
           <Conversation
             selectedConversation={selectedConversation}
             closeConversation={() => setSelectedConversation(null)}
+            currentUser={currentUser}
           />
         </Paper>
       </div>
