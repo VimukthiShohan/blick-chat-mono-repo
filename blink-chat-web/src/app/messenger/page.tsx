@@ -69,6 +69,7 @@ const MessengerPage = () => {
               setSelectedConversation(conversation)
             }
             unselectConversation={selectedConversation}
+            currentUser={currentUser}
           />
           <div className="bottom-4 absolute right-4">
             <IconButton>

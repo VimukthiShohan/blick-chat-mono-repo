@@ -27,3 +27,8 @@ export interface SocketNewMessageData
   receiverEmail: string;
   sentUserEmail: string;
 }
+
+export type SocketNewConversationData = Pick<
+  SocketNewMessageData,
+  'receiverEmail'
+>;

@@ -91,6 +91,14 @@ export class ConversationService {
       (item) => item.userEmail !== user.email,
     );
     const otherUserEmail = filteredResult.map((item) => item.userEmail);
+    const conversationMsgs = await this.prisma.message.findMany({
+      where: { conversationId: id },
+    });
+    if (conversationMsgs.length === 0) {
+      this.server.emit(SOCKET_EVENTS.NEW_CONVERSATION, {
+        receiverEmail: otherUserEmail[0],
+      });
+    }
     const msgCreateObj = await this.prisma.message.create({
       data: {
         msg: messageDto.msg,
@@ -98,6 +106,7 @@ export class ConversationService {
         userEmail: user.email,
       },
     });
+
     this.server.emit(SOCKET_EVENTS.NEW_MESSAGE, {
       receiverEmail: otherUserEmail[0],
       msg: messageDto.msg,
