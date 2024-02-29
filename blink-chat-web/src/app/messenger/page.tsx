@@ -87,11 +87,13 @@ const MessengerPage = () => {
         </Paper>
       </div>
 
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={handleCloseProfileModal}
-        user={currentUser}
-      />
+      {isProfileModalOpen ? (
+        <ProfileModal
+          isOpen={isProfileModalOpen}
+          onClose={handleCloseProfileModal}
+          user={currentUser}
+        />
+      ) : null}
     </div>
   );
 };

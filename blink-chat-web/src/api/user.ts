@@ -1,9 +1,10 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { ApiServiceErr, axiosApi, MutOptions } from './apiService';
 import {
   AuthResponse,
   RegisterBody,
+  UserInfoResponse,
   UserUpdateBody,
   UserUpdateResponse,
 } from '@/types/user.types';
@@ -23,3 +24,9 @@ export const useUpdateUser = (opt?: MutOptions<UserUpdateResponse>) =>
     },
     opt,
   );
+
+export const useGetUser = (email: string) =>
+  useQuery<UserInfoResponse, ApiServiceErr>([`user/${email}`], async () => {
+    const response = await axiosApi.get(`user/${email}`);
+    return response.data;
+  });

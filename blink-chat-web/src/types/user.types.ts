@@ -25,3 +25,5 @@ export type UserUpdateBody = Pick<
 >;
 
 export type UserUpdateResponse = Omit<AuthResponse, 'accessToken'>;
+
+export type UserInfoResponse = UserUpdateResponse;

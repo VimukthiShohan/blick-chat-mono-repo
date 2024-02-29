@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Paper,
   Typography,
@@ -10,7 +10,9 @@ import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
 import clsx from 'clsx';
 
+import { useGetUser } from '@/api/user';
 import { Nullable } from '@/api/apiService';
+import ProfileModal from '@/components/ProfileModal';
 import { ConversationResponse } from '@/types/conversation.types';
 
 interface ConversationProps {
@@ -22,6 +24,17 @@ const Conversation: React.FC<ConversationProps> = ({
   selectedConversation,
   closeConversation,
 }) => {
+  const { data: userData } = useGetUser(selectedConversation?.userEmail || '');
+
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  const handleOpenProfileModal = () => {
+    setIsProfileModalOpen(true);
+  };
+
+  const handleCloseProfileModal = () => {
+    setIsProfileModalOpen(false);
+  };
   const messages = [
     { text: 'Hello!', isUser: false },
     { text: 'Hi there!', isUser: true },
@@ -66,6 +79,7 @@ const Conversation: React.FC<ConversationProps> = ({
                 src={selectedConversation.profilePic}
                 alt={selectedConversation.userName}
                 className="mt-1"
+                onClick={handleOpenProfileModal}
               />
               <div className="flex flex-col ml-2">
                 <Typography variant="h5">
@@ -127,6 +141,14 @@ const Conversation: React.FC<ConversationProps> = ({
             </div>
           </div>
         </>
+      ) : null}
+
+      {isProfileModalOpen ? (
+        <ProfileModal
+          isOpen={isProfileModalOpen}
+          onClose={handleCloseProfileModal}
+          user={userData}
+        />
       ) : null}
     </Paper>
   );

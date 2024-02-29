@@ -1,15 +1,15 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, TextField, Avatar } from '@mui/material';
-import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { User } from '@/types/user.types';
 import { useUpdateUser } from '@/api/user';
 import { useSnack } from '@/utils/useSnack';
-import { saveUser } from '@/utils/cacheStorage';
 import LoadingButton from '@/components/LoadingButton';
+import { getUser, saveUser } from '@/utils/cacheStorage';
 import { VALIDATION_MSG } from '@/config/responseMessage';
 
 const validationSchema = Yup.object({
@@ -20,7 +20,7 @@ const validationSchema = Yup.object({
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: Omit<User, 'createdAt'>;
+  user?: Omit<User, 'createdAt'>;
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -28,6 +28,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   onClose,
   user,
 }) => {
+  const currentUser = getUser();
   const { showErrSnack } = useSnack();
 
   const { isLoading, mutate } = useUpdateUser({
@@ -43,15 +44,19 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
   const formik = useFormik({
     initialValues: {
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      email: user?.email,
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
     },
     validationSchema,
     onSubmit: (values) => {
       mutate(values);
     },
   });
+
+  useEffect(() => {
+    formik.resetForm();
+  }, [user, isOpen]);
 
   const modalOnClose = () => {
     setIsEditing(false);
@@ -63,7 +68,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       open={isOpen}
       onClose={modalOnClose}
       className="fixed inset-0 flex items-center justify-center"
-      title={'Edit profile'}
     >
       <div className="w-96 bg-white p-4 rounded-lg">
         <form className="space-y-6" onSubmit={formik.handleSubmit}>
@@ -123,9 +127,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             <TextField label="Email" value={user?.email} disabled fullWidth />
           </div>
           <div className="flex justify-end">
-            <Button onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? 'Cancel' : 'Edit'}
-            </Button>
+            {currentUser.email === user?.email && (
+              <Button onClick={() => setIsEditing(!isEditing)}>
+                {isEditing ? 'Cancel' : 'Edit'}
+              </Button>
+            )}
             {isEditing && (
               <LoadingButton
                 type="submit"
