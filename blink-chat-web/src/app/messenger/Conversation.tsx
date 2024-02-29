@@ -62,7 +62,7 @@ const Conversation: React.FC<ConversationProps> = ({
       socket.on(
         SOCKET_EVENTS.NEW_MESSAGE,
         (socketData: SocketNewMessageData) => {
-          const { receiverEmail, msg, sentUserEmail } = socketData;
+          const { receiverEmail, msg, sentUserEmail, id } = socketData;
           if (receiverEmail === currentUser.email) {
             setConversationData((prevState) => [
               ...prevState,
@@ -70,7 +70,7 @@ const Conversation: React.FC<ConversationProps> = ({
                 msg,
                 conversationId: selectedConversation?.conversationId || '',
                 userEmail: sentUserEmail,
-                id: new Date(Date.now()).toString(),
+                id,
               },
             ]);
           }

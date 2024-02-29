@@ -23,7 +23,7 @@ export interface ConversationMessageResponse extends ConversationMessageBody {
 }
 
 export interface SocketNewMessageData
-  extends Pick<ConversationMessagesResponse, 'msg'> {
+  extends Pick<ConversationMessagesResponse, 'msg' | 'id'> {
   receiverEmail: string;
   sentUserEmail: string;
 }
