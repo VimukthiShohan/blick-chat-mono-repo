@@ -28,8 +28,8 @@ export class ConversationController {
 
   @Get()
   @UseGuards(AuthGuard)
-  findAll() {
-    return this.conversationService.findAll();
+  findAll(@Req() request: ReqWithUser) {
+    return this.conversationService.findAll(request);
   }
 
   @Get(':id')
