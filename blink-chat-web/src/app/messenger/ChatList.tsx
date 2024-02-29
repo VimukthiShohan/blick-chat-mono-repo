@@ -18,7 +18,7 @@ const ChatList = () => {
   return (
     <List className="overflow-y-auto">
       {chatListData?.length === 0 ? (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center mt-3">
           <Typography>No conversations yet</Typography>
         </div>
       ) : (

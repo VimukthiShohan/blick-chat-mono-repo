@@ -50,14 +50,14 @@ export class ConversationService {
       const related = userConversation.filter(
         (item) => item.userEmail === request.user.email,
       );
-      if (related.length === 0) return;
+      if (related.length === 0) continue;
       const conversationObj = userConversation.find(
         (item) => item.userEmail !== request.user.email,
       );
-      if (conversationObj === undefined) return;
+      if (conversationObj === undefined) continue;
       const user = await this.userService.findOne(conversationObj.userEmail);
       if (!user) {
-        return;
+        continue;
       }
       results.push({
         ...conversationObj,
