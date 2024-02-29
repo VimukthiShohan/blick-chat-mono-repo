@@ -18,3 +18,10 @@ export type RegisterBody = Pick<
   'firstName' | 'lastName' | 'email'
 > &
   Pick<LoginBody, 'password'>;
+
+export type UserUpdateBody = Pick<
+  RegisterBody,
+  'firstName' | 'lastName' | 'email'
+>;
+
+export type UserUpdateResponse = Omit<AuthResponse, 'accessToken'>;
