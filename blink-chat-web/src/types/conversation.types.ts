@@ -22,13 +22,6 @@ export interface ConversationMessageResponse extends ConversationMessageBody {
   userEmail: string;
 }
 
-export interface SocketNewMessageData
-  extends Pick<ConversationMessagesResponse, 'msg' | 'id'> {
+export interface SocketNewConversationData {
   receiverEmail: string;
-  sentUserEmail: string;
 }
-
-export type SocketNewConversationData = Pick<
-  SocketNewMessageData,
-  'receiverEmail'
->;

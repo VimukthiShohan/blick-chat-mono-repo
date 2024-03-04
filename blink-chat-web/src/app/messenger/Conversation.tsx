@@ -20,7 +20,6 @@ import { useGetConversationMessages, useSendMessage } from '@/api/coversation';
 import {
   ConversationMessagesResponse,
   ConversationResponse,
-  SocketNewMessageData,
 } from '@/types/conversation.types';
 
 interface ConversationProps {
@@ -36,14 +35,13 @@ const Conversation: React.FC<ConversationProps> = ({
 }) => {
   const { socket } = useSocket();
 
+  const conversationId = selectedConversation?.conversationId || '';
+
   const { data: userData } = useGetUser(selectedConversation?.userEmail || '');
-  const { data, refetch } = useGetConversationMessages(
-    selectedConversation?.conversationId || '',
-  );
+  const { data } = useGetConversationMessages(conversationId);
   const { mutate } = useSendMessage({
     onSuccess: () => {
       setMsg('');
-      refetch();
     },
   });
 
@@ -59,31 +57,40 @@ const Conversation: React.FC<ConversationProps> = ({
 
   useEffect(() => {
     if (socket) {
+      socket.emit(SOCKET_EVENTS.JOIN_ROOM, conversationId);
+    }
+
+    return () => {
+      socket.emit(SOCKET_EVENTS.LEAVE_ROOM, conversationId);
+    };
+  }, [conversationId]);
+
+  useEffect(() => {
+    if (socket) {
       socket.on(
-        SOCKET_EVENTS.NEW_MESSAGE,
-        (socketData: SocketNewMessageData) => {
-          const { receiverEmail, msg, sentUserEmail, id } = socketData;
-          if (receiverEmail === currentUser.email) {
-            setConversationData((prevState) => [
-              ...prevState,
-              {
-                msg,
-                conversationId: selectedConversation?.conversationId || '',
-                userEmail: sentUserEmail,
-                id,
-              },
-            ]);
-          }
+        SOCKET_EVENTS.CONVERSATION_MESSAGE,
+        (msg: ConversationMessagesResponse) => {
+          setConversationData((prevState) => [...prevState, msg]);
         },
       );
     }
 
     return () => {
-      if (socket) {
-        socket.off(SOCKET_EVENTS.NEW_MESSAGE);
-      }
+      socket.off(SOCKET_EVENTS.CONVERSATION_MESSAGE);
     };
-  }, [socket]);
+  }, []);
+
+  const sendMessage = () => {
+    mutate({ conversationId, msg });
+    if (socket) {
+      socket.emit(SOCKET_EVENTS.CONVERSATION_MESSAGE, {
+        id: new Date(Date.now()).toString(),
+        msg,
+        userEmail: currentUser.email,
+        conversationId,
+      });
+    }
+  };
 
   const handleOpenProfileModal = () => {
     setIsProfileModalOpen(true);
@@ -94,7 +101,7 @@ const Conversation: React.FC<ConversationProps> = ({
   };
 
   return (
-    <Paper variant="outlined" className="h-screen flex flex-col">
+    <Paper className="h-screen flex flex-col border-b border-gray-300">
       {selectedConversation ? (
         <>
           <div className="flex p-2 justify-between bg-blue-700">
@@ -115,7 +122,7 @@ const Conversation: React.FC<ConversationProps> = ({
           </div>
 
           <div
-            className="flex flex-col flex-grow overflow-y-auto p-4"
+            className="basis-[85%] overflow-y-scroll p-5 w-full flex flex-col gap-2"
             style={{
               flexGrow: 1,
               overflowY: 'auto',
@@ -129,18 +136,21 @@ const Conversation: React.FC<ConversationProps> = ({
                   .slice(0)
                   .reverse()
                   .map((msgObj, index) => (
-                    <Paper
+                    <div
                       key={index}
-                      elevation={3}
                       className={clsx(
-                        'p-2 m-2 max-w-[100%]',
+                        'flex flex-col items-end bg-blue-100 rounded-full',
                         msgObj.userEmail === currentUser.email
-                          ? 'bg-blue-500 text-white text-right'
-                          : 'bg-gray-200 text-left',
+                          ? 'self-end rounded-br-none'
+                          : 'self-start rounded-bl-none',
                       )}
                     >
-                      {msgObj.msg}
-                    </Paper>
+                      {msgObj.msg && (
+                        <div className="flex justify-center items-center px-3 py-1">
+                          <p className="text-black">{msgObj.msg}</p>
+                        </div>
+                      )}
+                    </div>
                   ))}
           </div>
 
@@ -155,17 +165,13 @@ const Conversation: React.FC<ConversationProps> = ({
                 label="Type your message"
                 value={msg}
                 onChange={(event) => setMsg(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') sendMessage();
+                }}
               />
             </div>
             <div className="w-1/12 flex justify-center pb-2">
-              <IconButton
-                onClick={() =>
-                  mutate({
-                    conversationId: selectedConversation.conversationId,
-                    msg,
-                  })
-                }
-              >
+              <IconButton onClick={sendMessage}>
                 <SendIcon className="text-blue-500" fontSize={'large'} />
               </IconButton>
             </div>

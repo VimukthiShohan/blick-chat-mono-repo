@@ -99,22 +99,13 @@ export class ConversationService {
         receiverEmail: otherUserEmail[0],
       });
     }
-    const msgCreateObj = await this.prisma.message.create({
+    return this.prisma.message.create({
       data: {
         msg: messageDto.msg,
         conversationId: id,
         userEmail: user.email,
       },
     });
-
-    this.server.emit(SOCKET_EVENTS.NEW_MESSAGE, {
-      receiverEmail: otherUserEmail[0],
-      msg: messageDto.msg,
-      sentUserEmail: user.email,
-      id: msgCreateObj.id,
-    });
-
-    return msgCreateObj;
   }
 
   removeConversationMessage(id: string) {
