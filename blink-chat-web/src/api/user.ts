@@ -30,3 +30,9 @@ export const useGetUser = (email: string) =>
     const response = await axiosApi.get(`user/${email}`);
     return response.data;
   });
+
+export const useGetAllUsers = () =>
+  useQuery<UserInfoResponse[], ApiServiceErr>(['user'], async () => {
+    const response = await axiosApi.get('user');
+    return response.data;
+  });

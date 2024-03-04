@@ -12,6 +12,8 @@ import Conversation from './Conversation';
 import { Nullable } from '@/api/apiService';
 import { getUser } from '@/utils/cacheStorage';
 import ProfileModal from '@/components/ProfileModal';
+import { useCreateConversation } from '@/api/coversation';
+import StartChatModal from '@/app/messenger/StartChatModal';
 import { ConversationResponse } from '@/types/conversation.types';
 
 const MessengerLayout = () => {
@@ -19,9 +21,19 @@ const MessengerLayout = () => {
   const currentUser = getUser();
   const queryClient = useQueryClient();
 
+  const [newChatStarted, setNewChatStarted] = useState(false);
+  const [startChatModal, setStartChatModal] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedConversation, setSelectedConversation] =
     useState<Nullable<ConversationResponse>>(null);
+
+  const { mutate } = useCreateConversation({
+    onSuccess: (res) => {
+      setSelectedConversation(res);
+      setNewChatStarted(!newChatStarted);
+      setStartChatModal(false);
+    },
+  });
 
   const handleOpenProfileModal = () => {
     setIsProfileModalOpen(true);
@@ -29,6 +41,10 @@ const MessengerLayout = () => {
 
   const handleCloseProfileModal = () => {
     setIsProfileModalOpen(false);
+  };
+
+  const handleCloseStartChatModal = () => {
+    setStartChatModal(false);
   };
 
   const logout = () => {
@@ -61,9 +77,10 @@ const MessengerLayout = () => {
             }
             unselectConversation={selectedConversation}
             currentUser={currentUser}
+            newChatStarted={newChatStarted}
           />
           <div className="bottom-4 absolute right-4">
-            <IconButton>
+            <IconButton onClick={() => setStartChatModal(true)}>
               <AddCircleRoundedIcon
                 className="text-blue-500"
                 fontSize={'large'}
@@ -88,6 +105,17 @@ const MessengerLayout = () => {
           isOpen={isProfileModalOpen}
           onClose={handleCloseProfileModal}
           user={currentUser}
+        />
+      ) : null}
+
+      {startChatModal ? (
+        <StartChatModal
+          isOpen={startChatModal}
+          onClose={handleCloseStartChatModal}
+          currentUser={currentUser}
+          selectedUser={(user) => {
+            if (user) mutate({ chatCandidate: user.email });
+          }}
         />
       ) : null}
     </div>

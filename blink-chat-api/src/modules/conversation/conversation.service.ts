@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConversationDto, MessageDto } from './dto/conversation.dto';
 import { PrismaService } from 'nestjs-prisma';
 import { User } from '@prisma/client';
@@ -7,6 +7,7 @@ import { Server } from 'http';
 import { SOCKET_EVENTS } from '../../utils/socketEvents';
 import { ReqWithUser } from '../../utils/interfaces/reqWithUser';
 import { UserService } from '../user/user.service';
+import { USER_MESSAGE } from '../../utils/responseMessages';
 
 @Injectable()
 @WebSocketGateway({ cors: true })
@@ -18,8 +19,8 @@ export class ConversationService {
 
   @WebSocketServer()
   server!: Server;
-  create(createConversationDto: ConversationDto, user: User) {
-    return this.prisma.conversation.create({
+  async create(createConversationDto: ConversationDto, user: User) {
+    const createdConversation = await this.prisma.conversation.create({
       data: {
         UserConversation: {
           create: [
@@ -33,6 +34,21 @@ export class ConversationService {
         },
       },
     });
+
+    const chatCandidate = await this.userService.findOne(
+      createConversationDto.chatCandidate,
+    );
+
+    if (!chatCandidate) {
+      throw new BadRequestException(USER_MESSAGE.NOT_FOUND);
+    }
+
+    return {
+      conversationId: createdConversation.id,
+      userEmail: chatCandidate.email,
+      userName: `${chatCandidate.firstName} ${chatCandidate.lastName}`,
+      profilePic: chatCandidate.profilePic,
+    };
   }
 
   async findAll(request: ReqWithUser) {

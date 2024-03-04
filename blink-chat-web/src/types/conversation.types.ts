@@ -25,3 +25,7 @@ export interface ConversationMessageResponse extends ConversationMessageBody {
 export interface SocketNewConversationData {
   receiverEmail: string;
 }
+
+export interface ConversationCreateBody {
+  chatCandidate: string;
+}

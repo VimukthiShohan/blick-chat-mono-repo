@@ -29,18 +29,24 @@ interface ChatListProps {
   setSelectedConversation: (chat: ConversationResponse) => void;
   unselectConversation: Nullable<ConversationResponse>;
   currentUser: User;
+  newChatStarted: boolean;
 }
 
 const ChatList: React.FC<ChatListProps> = ({
   setSelectedConversation,
   unselectConversation,
   currentUser,
+  newChatStarted,
 }) => {
   const { socket } = useSocket();
 
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: chatListData, isLoading, refetch } = useGetConversations();
+
+  useEffect(() => {
+    refetch();
+  }, [newChatStarted]);
 
   useEffect(() => {
     if (socket) {
