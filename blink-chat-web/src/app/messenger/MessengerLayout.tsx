@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Paper, IconButton, Avatar } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -26,6 +26,12 @@ const MessengerLayout = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedConversation, setSelectedConversation] =
     useState<Nullable<ConversationResponse>>(null);
+
+  useEffect(() => {
+    if (!currentUser) {
+      router.push('/login');
+    }
+  }, []);
 
   const { mutate } = useCreateConversation({
     onSuccess: (res) => {

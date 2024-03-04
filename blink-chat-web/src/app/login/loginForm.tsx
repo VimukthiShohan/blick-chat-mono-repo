@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Link, TextField } from '@mui/material';
@@ -11,7 +11,7 @@ import { useLogin } from '@/api/auth';
 import { useSnack } from '@/utils/useSnack';
 import LoadingButton from '@/components/LoadingButton';
 import { VALIDATION_MSG } from '@/config/responseMessage';
-import { saveTokenInLocal, saveUser } from '@/utils/cacheStorage';
+import { getUser, saveTokenInLocal, saveUser } from '@/utils/cacheStorage';
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -22,6 +22,7 @@ const validationSchema = Yup.object({
 
 const LoginForm: FC = () => {
   const router = useRouter();
+  const currentUser = getUser();
   const { showErrSnack } = useSnack();
 
   const { isLoading, mutate } = useLogin({
@@ -33,6 +34,12 @@ const LoginForm: FC = () => {
     },
     onError: (err) => showErrSnack(err),
   });
+
+  useEffect(() => {
+    if (currentUser) {
+      router.push('/messenger');
+    }
+  }, []);
 
   const formik = useFormik({
     initialValues: {
