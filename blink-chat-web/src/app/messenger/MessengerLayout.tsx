@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Paper, InputBase, IconButton, Avatar } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { Paper, IconButton, Avatar } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import { useQueryClient } from '@tanstack/react-query';
@@ -56,16 +55,6 @@ const MessengerLayout = () => {
         </div>
 
         <div className="flex flex-col h-full w-full relative">
-          <Paper className="px-4 py-3 border-b border-gray-300 flex flex-row">
-            <InputBase
-              placeholder="Search"
-              className="w-full focus:outline-none"
-            />
-            <IconButton>
-              <SearchIcon />
-            </IconButton>
-          </Paper>
-
           <ChatList
             setSelectedConversation={(conversation) =>
               setSelectedConversation(conversation)

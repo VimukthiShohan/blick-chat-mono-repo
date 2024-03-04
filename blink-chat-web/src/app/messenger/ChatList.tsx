@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   List,
   ListItem,
@@ -8,7 +8,11 @@ import {
   ListItemAvatar,
   Avatar,
   Typography,
+  Paper,
+  InputBase,
+  IconButton,
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import useSocket from '@/utils/useSocket';
@@ -34,6 +38,8 @@ const ChatList: React.FC<ChatListProps> = ({
 }) => {
   const { socket } = useSocket();
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const { data: chatListData, isLoading, refetch } = useGetConversations();
 
   useEffect(() => {
@@ -58,6 +64,18 @@ const ChatList: React.FC<ChatListProps> = ({
 
   return (
     <>
+      <Paper className="px-4 py-3 border-b border-gray-300 flex flex-row">
+        <InputBase
+          placeholder="Search"
+          className="w-full focus:outline-none"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <IconButton>
+          <SearchIcon />
+        </IconButton>
+      </Paper>
+
       {isLoading ? (
         <div className="flex justify-center mt-3">
           <CircularProgress size={24} />
@@ -69,20 +87,24 @@ const ChatList: React.FC<ChatListProps> = ({
               <Typography>No conversations yet</Typography>
             </div>
           ) : (
-            chatListData?.map((chat) => (
-              <ListItem
-                key={chat.conversationId}
-                onClick={() => {
-                  setSelectedConversation(chat);
-                }}
-                className={`bg-${unselectConversation?.conversationId === chat.conversationId ? 'blue-100' : 'white'} border-b border-t border-gray-300`}
-              >
-                <ListItemAvatar>
-                  <Avatar />
-                </ListItemAvatar>
-                <ListItemText primary={chat.userName} />
-              </ListItem>
-            ))
+            chatListData
+              ?.filter((chat) =>
+                chat.userName.toLowerCase().includes(searchQuery.toLowerCase()),
+              )
+              ?.map((chat) => (
+                <ListItem
+                  key={chat.conversationId}
+                  onClick={() => {
+                    setSelectedConversation(chat);
+                  }}
+                  className={`bg-${unselectConversation?.conversationId === chat.conversationId ? 'blue-100' : 'white'} border-b border-t border-gray-300`}
+                >
+                  <ListItemAvatar>
+                    <Avatar />
+                  </ListItemAvatar>
+                  <ListItemText primary={chat.userName} />
+                </ListItem>
+              ))
           )}
         </List>
       )}
