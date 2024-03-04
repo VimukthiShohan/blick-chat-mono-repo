@@ -75,15 +75,12 @@ const ChatList: React.FC<ChatListProps> = ({
                 onClick={() => {
                   setSelectedConversation(chat);
                 }}
-                className={`bg-${unselectConversation?.conversationId === chat.conversationId ? 'gray-400' : 'white'} border-b border-t border-gray-300`}
+                className={`bg-${unselectConversation?.conversationId === chat.conversationId ? 'blue-100' : 'white'} border-b border-t border-gray-300`}
               >
                 <ListItemAvatar>
                   <Avatar />
                 </ListItemAvatar>
-                <ListItemText
-                  primary={chat.userName}
-                  secondary={true ? 'Online' : 'Offline'}
-                />
+                <ListItemText primary={chat.userName} />
               </ListItem>
             ))
           )}

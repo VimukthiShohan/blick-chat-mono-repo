@@ -97,25 +97,20 @@ const Conversation: React.FC<ConversationProps> = ({
     <Paper variant="outlined" className="h-screen flex flex-col">
       {selectedConversation ? (
         <>
-          <div className="flex p-2 justify-between bg-blue-500">
-            <div className="flex flex-row">
+          <div className="flex p-2 justify-between bg-blue-700">
+            <div className="flex flex-row items-center">
               <Avatar
                 src={selectedConversation.profilePic}
                 alt={selectedConversation.userName}
-                className="mt-1"
+                className="mt-1 mr-2 mb-1"
                 onClick={handleOpenProfileModal}
               />
-              <div className="flex flex-col ml-2">
-                <Typography variant="h5">
-                  {selectedConversation.userName}
-                </Typography>
-                <Typography variant="caption">
-                  {true ? 'Online' : 'Offline'}
-                </Typography>
-              </div>
+              <Typography variant="h5" className="text-white">
+                {selectedConversation.userName}
+              </Typography>
             </div>
             <IconButton onClick={() => closeConversation(null)}>
-              <CloseIcon fontSize={'medium'} />
+              <CloseIcon fontSize={'medium'} className="text-white" />
             </IconButton>
           </div>
 

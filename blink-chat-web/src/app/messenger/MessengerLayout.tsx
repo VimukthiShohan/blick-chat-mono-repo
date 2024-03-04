@@ -41,9 +41,11 @@ const MessengerLayout = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/3 bg-gray-200 flex">
+      <div className="w-1/3 bg-gray-50 flex">
         <div
-          className={'bg-blue-500 w-20 px-4 py-2 border-b border-gray-300 flex'}
+          className={
+            'bg-gray-50 w-20 px-4 py-2 border-b border-r border-gray-300 flex'
+          }
         >
           <div className="flex justify-between items-center flex-col">
             <Avatar className="mt-2" onClick={handleOpenProfileModal} />
