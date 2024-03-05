@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { ApiServiceErr, axiosApi, MutOptions } from '@/api/apiService';
 import {
   ConversationCreateBody,
+  ConversationDeleteResponse,
   ConversationMessageBody,
   ConversationMessageResponse,
   ConversationMessagesResponse,
@@ -51,3 +52,11 @@ export const useCreateConversation = (opt?: MutOptions<ConversationResponse>) =>
     },
     opt,
   );
+
+export const useDeleteConnversation = (
+  opt?: MutOptions<ConversationDeleteResponse>,
+) =>
+  useMutation<ConversationDeleteResponse, ApiServiceErr, string>(async (id) => {
+    const response = await axiosApi.delete(`/conversation/${id}`);
+    return response.data;
+  }, opt);

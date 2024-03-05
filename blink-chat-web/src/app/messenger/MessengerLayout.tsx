@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import ChatList from './ChatList';
 import Conversation from './Conversation';
 import { Nullable } from '@/api/apiService';
+import { useSnack } from '@/utils/useSnack';
 import { getImgUrl } from '@/utils/getImgUrl';
 import { getUser } from '@/utils/cacheStorage';
 import ProfileModal from '@/components/ProfileModal';
@@ -20,6 +21,7 @@ import { ConversationResponse } from '@/types/conversation.types';
 const MessengerLayout = () => {
   const router = useRouter();
   const currentUser = getUser();
+  const { showErrSnack } = useSnack();
   const queryClient = useQueryClient();
 
   const [newChatStarted, setNewChatStarted] = useState(false);
@@ -40,6 +42,7 @@ const MessengerLayout = () => {
       setNewChatStarted(!newChatStarted);
       setStartChatModal(false);
     },
+    onError: (err) => showErrSnack(err),
   });
 
   const handleOpenProfileModal = () => {
@@ -107,6 +110,7 @@ const MessengerLayout = () => {
             selectedConversation={selectedConversation}
             closeConversation={() => setSelectedConversation(null)}
             currentUser={currentUser}
+            refetchChatList={() => setNewChatStarted(!newChatStarted)}
           />
         </Paper>
       </div>

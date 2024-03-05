@@ -8,17 +8,24 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
 import clsx from 'clsx';
 
 import { useGetUser } from '@/api/user';
 import { User } from '@/types/user.types';
 import useSocket from '@/utils/useSocket';
 import { Nullable } from '@/api/apiService';
+import { useSnack } from '@/utils/useSnack';
 import { getImgUrl } from '@/utils/getImgUrl';
 import { SOCKET_EVENTS } from '@/config/constant';
 import ProfileModal from '@/components/ProfileModal';
-import { useGetConversationMessages, useSendMessage } from '@/api/coversation';
 import {
+  useDeleteConnversation,
+  useGetConversationMessages,
+  useSendMessage,
+} from '@/api/coversation';
+import {
+  ConversationDeleteResponse,
   ConversationMessagesResponse,
   ConversationResponse,
 } from '@/types/conversation.types';
@@ -27,13 +34,16 @@ interface ConversationProps {
   selectedConversation: Nullable<ConversationResponse>;
   closeConversation: (p: null) => void;
   currentUser: User;
+  refetchChatList: (p: ConversationDeleteResponse) => void;
 }
 
 const Conversation: React.FC<ConversationProps> = ({
   selectedConversation,
   closeConversation,
   currentUser,
+  refetchChatList,
 }) => {
+  const { showErrSnack } = useSnack();
   const { socket } = useSocket();
 
   const conversationId = selectedConversation?.conversationId || '';
@@ -44,6 +54,14 @@ const Conversation: React.FC<ConversationProps> = ({
     onSuccess: () => {
       setMsg('');
     },
+    onError: (err) => showErrSnack(err),
+  });
+  const { mutate: mutateDeleteConversation } = useDeleteConnversation({
+    onSuccess: (res) => {
+      refetchChatList(res);
+      closeConversation(null);
+    },
+    onError: (err) => showErrSnack(err),
   });
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -119,9 +137,16 @@ const Conversation: React.FC<ConversationProps> = ({
                 {selectedConversation.userName}
               </Typography>
             </div>
-            <IconButton onClick={() => closeConversation(null)}>
-              <CloseIcon fontSize={'medium'} className="text-white" />
-            </IconButton>
+            <div>
+              <IconButton
+                onClick={() => mutateDeleteConversation(conversationId)}
+              >
+                <DeleteIcon fontSize={'medium'} className="text-white" />
+              </IconButton>
+              <IconButton onClick={() => closeConversation(null)}>
+                <CloseIcon fontSize={'medium'} className="text-white" />
+              </IconButton>
+            </div>
           </div>
 
           <div className="basis-[85%] overflow-y-scroll p-5 w-full flex flex-col-reverse gap-2">

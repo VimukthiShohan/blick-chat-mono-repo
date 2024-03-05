@@ -32,3 +32,8 @@ export interface SocketNewConversationData {
 export interface ConversationCreateBody {
   chatCandidate: string;
 }
+
+export type ConversationDeleteResponse = Pick<
+  ConversationMessageResponse,
+  'id' | 'createdAt'
+>;
