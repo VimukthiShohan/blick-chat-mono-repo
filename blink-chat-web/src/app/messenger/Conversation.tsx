@@ -110,7 +110,7 @@ const Conversation: React.FC<ConversationProps> = ({
           <div className="flex p-2 justify-between bg-blue-700">
             <div className="flex flex-row items-center">
               <Avatar
-                src={selectedConversation.profilePic}
+                src={getImgUrl(selectedConversation.profilePic)}
                 alt={selectedConversation.userName}
                 className="mt-1 mr-2 mb-1"
                 onClick={handleOpenProfileModal}
