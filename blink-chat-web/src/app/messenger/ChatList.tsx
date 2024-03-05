@@ -98,6 +98,7 @@ const ChatList: React.FC<ChatListProps> = ({
               ?.filter((chat) =>
                 chat.userName.toLowerCase().includes(searchQuery.toLowerCase()),
               )
+              .reverse()
               ?.map((chat) => (
                 <ListItem
                   key={chat.conversationId}

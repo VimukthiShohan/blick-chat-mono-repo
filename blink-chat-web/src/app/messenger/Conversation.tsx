@@ -14,6 +14,7 @@ import { useGetUser } from '@/api/user';
 import { User } from '@/types/user.types';
 import useSocket from '@/utils/useSocket';
 import { Nullable } from '@/api/apiService';
+import { getImgUrl } from '@/utils/getImgUrl';
 import { SOCKET_EVENTS } from '@/config/constant';
 import ProfileModal from '@/components/ProfileModal';
 import { useGetConversationMessages, useSendMessage } from '@/api/coversation';
@@ -81,14 +82,16 @@ const Conversation: React.FC<ConversationProps> = ({
   }, []);
 
   const sendMessage = () => {
-    mutate({ conversationId, msg });
-    if (socket) {
-      socket.emit(SOCKET_EVENTS.CONVERSATION_MESSAGE, {
-        id: new Date(Date.now()).toString(),
-        msg,
-        userEmail: currentUser.email,
-        conversationId,
-      });
+    if (msg !== '') {
+      mutate({ conversationId, msg });
+      if (socket) {
+        socket.emit(SOCKET_EVENTS.CONVERSATION_MESSAGE, {
+          id: new Date(Date.now()).toString(),
+          msg,
+          userEmail: currentUser.email,
+          conversationId,
+        });
+      }
     }
   };
 
@@ -121,15 +124,7 @@ const Conversation: React.FC<ConversationProps> = ({
             </IconButton>
           </div>
 
-          <div
-            className="basis-[85%] overflow-y-scroll p-5 w-full flex flex-col gap-2"
-            style={{
-              flexGrow: 1,
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column-reverse',
-            }}
-          >
+          <div className="basis-[85%] overflow-y-scroll p-5 w-full flex flex-col-reverse gap-2">
             {!conversationData || conversationData?.length === 0
               ? null
               : conversationData
@@ -139,15 +134,27 @@ const Conversation: React.FC<ConversationProps> = ({
                     <div
                       key={index}
                       className={clsx(
-                        'flex flex-col items-end bg-blue-100 rounded-full',
+                        'flex items-end gap-2',
                         msgObj.userEmail === currentUser.email
-                          ? 'self-end rounded-br-none'
-                          : 'self-start rounded-bl-none',
+                          ? 'self-end flex-row'
+                          : 'self-start flex-row-reverse',
                       )}
                     >
                       {msgObj.msg && (
-                        <div className="flex justify-center items-center px-3 py-1">
+                        <div
+                          className={clsx(
+                            'flex justify-center items-center px-3 py-1 bg-blue-100 rounded-full',
+                            msgObj.userEmail === currentUser.email
+                              ? 'rounded-br-none'
+                              : 'rounded-bl-none',
+                          )}
+                        >
                           <p className="text-black">{msgObj.msg}</p>
+                        </div>
+                      )}
+                      {msgObj.userProfilePic && (
+                        <div className="flex justify-center items-center">
+                          <Avatar src={getImgUrl(msgObj.userProfilePic)} />
                         </div>
                       )}
                     </div>

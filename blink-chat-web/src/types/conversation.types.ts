@@ -1,3 +1,5 @@
+import { Nullable } from '@/api/apiService';
+
 export interface ConversationResponse {
   conversationId: string;
   userEmail: string;
@@ -9,6 +11,7 @@ export interface ConversationMessagesResponse
   extends Pick<ConversationResponse, 'userEmail' | 'conversationId'> {
   id: string;
   msg: string;
+  userProfilePic: Nullable<string>;
 }
 
 export type ConversationMessageBody = Pick<

@@ -93,8 +93,35 @@ export class ConversationService {
     return this.prisma.conversation.delete({ where: { id } });
   }
 
-  findAllConversationMessages(id: string) {
-    return this.prisma.message.findMany({ where: { conversationId: id } });
+  async findAllConversationMessages(id: string) {
+    let results: Array<{
+      id: string;
+      msg: string;
+      createdAt: Date;
+      conversationId: string;
+      userEmail: string;
+      userProfilePic: string | null;
+    }> = [];
+    const conversationMessages = await this.prisma.message.findMany({
+      where: { conversationId: id },
+    });
+    if (conversationMessages.length === 0) return results;
+    for (const Message of conversationMessages) {
+      const user = await this.userService.findOne(Message.userEmail);
+      if (!user) {
+        results.push({
+          ...Message,
+          userProfilePic: null,
+        });
+        continue;
+      }
+      results.push({
+        ...Message,
+        userProfilePic: user.profilePic,
+      });
+    }
+
+    return results;
   }
 
   async createConversationMessage(
