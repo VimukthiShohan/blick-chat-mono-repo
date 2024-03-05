@@ -1,8 +1,10 @@
+import { Nullable } from '@/api/apiService';
+
 export interface AuthResponse {
   email: string;
   firstName: string;
   lastName: string;
-  profilePic: string;
+  profilePic: Nullable<string>;
   createdAt: string;
   accessToken: string;
 }
@@ -20,8 +22,8 @@ export type RegisterBody = Pick<
   Pick<LoginBody, 'password'>;
 
 export type UserUpdateBody = Pick<
-  RegisterBody,
-  'firstName' | 'lastName' | 'email'
+  AuthResponse,
+  'firstName' | 'lastName' | 'email' | 'profilePic'
 >;
 
 export type UserUpdateResponse = Omit<AuthResponse, 'accessToken'>;

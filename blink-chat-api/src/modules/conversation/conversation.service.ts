@@ -56,6 +56,7 @@ export class ConversationService {
       conversationId: string;
       userEmail: string;
       userName: string;
+      profilePic: string | null;
     }> = [];
     const conversations = await this.prisma.conversation.findMany();
     if (conversations.length === 0) return results;
@@ -78,6 +79,7 @@ export class ConversationService {
       results.push({
         ...conversationObj,
         userName: `${user.firstName} ${user.lastName}`,
+        profilePic: user.profilePic,
       });
     }
     return results;

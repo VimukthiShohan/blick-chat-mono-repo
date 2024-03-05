@@ -18,6 +18,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import useSocket from '@/utils/useSocket';
 import { User } from '@/types/user.types';
 import { Nullable } from '@/api/apiService';
+import { getImgUrl } from '@/utils/getImgUrl';
 import { SOCKET_EVENTS } from '@/config/constant';
 import { useGetConversations } from '@/api/coversation';
 import {
@@ -106,7 +107,7 @@ const ChatList: React.FC<ChatListProps> = ({
                   className={`bg-${unselectConversation?.conversationId === chat.conversationId ? 'blue-100' : 'white'} border-b border-t border-gray-300`}
                 >
                   <ListItemAvatar>
-                    <Avatar />
+                    <Avatar src={getImgUrl(chat.profilePic)} />
                   </ListItemAvatar>
                   <ListItemText primary={chat.userName} />
                 </ListItem>

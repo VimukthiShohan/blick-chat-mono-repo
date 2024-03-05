@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import ChatList from './ChatList';
 import Conversation from './Conversation';
 import { Nullable } from '@/api/apiService';
+import { getImgUrl } from '@/utils/getImgUrl';
 import { getUser } from '@/utils/cacheStorage';
 import ProfileModal from '@/components/ProfileModal';
 import { useCreateConversation } from '@/api/coversation';
@@ -69,7 +70,11 @@ const MessengerLayout = () => {
           }
         >
           <div className="flex justify-between items-center flex-col">
-            <Avatar className="mt-2" onClick={handleOpenProfileModal} />
+            <Avatar
+              className="mt-2"
+              onClick={handleOpenProfileModal}
+              src={getImgUrl(currentUser?.profilePic)}
+            />
             <IconButton onClick={logout}>
               <LogoutIcon />
             </IconButton>

@@ -6,11 +6,12 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { User } from '@/types/user.types';
-import { useUpdateUser } from '@/api/user';
 import { useSnack } from '@/utils/useSnack';
 import LoadingButton from '@/components/LoadingButton';
 import { getUser, saveUser } from '@/utils/cacheStorage';
 import { VALIDATION_MSG } from '@/config/responseMessage';
+import { useUpdateUser, useUserImgUpload } from '@/api/user';
+import { getImgUrl } from '@/utils/getImgUrl';
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required(VALIDATION_MSG.F_NAME_REQ),
@@ -31,6 +32,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const currentUser = getUser();
   const { showErrSnack } = useSnack();
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(
+    user?.profilePic || null,
+  );
+  const [file, setFile] = useState<File>();
+
   const { isLoading, mutate } = useUpdateUser({
     onSuccess: (data) => {
       saveUser(data);
@@ -39,8 +46,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     onError: (err) => showErrSnack(err),
   });
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [profilePicture, setProfilePicture] = useState(user?.profilePic);
+  const { mutate: mutateProfileImg } = useUserImgUpload({
+    onSuccess: (data) => {
+      setProfilePicture(data);
+    },
+    onError: (err) => showErrSnack(err),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -50,7 +61,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     },
     validationSchema,
     onSubmit: (values) => {
-      mutate(values);
+      mutate({ ...values, profilePic: profilePicture });
     },
   });
 
@@ -61,6 +72,22 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const modalOnClose = () => {
     setIsEditing(false);
     onClose();
+  };
+
+  useEffect(() => {
+    uploadFile();
+  }, [file]);
+
+  const uploadFile = () => {
+    if (file) {
+      const fileType = file.type;
+      if (fileType === 'image/jpeg' || fileType === 'image/jpg') {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        mutateProfileImg(formData);
+      }
+    }
   };
 
   return (
@@ -74,7 +101,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           <div className="mb-4 flex justify-center items-center flex-col">
             <Avatar
               alt={user?.firstName}
-              src={profilePicture}
+              src={getImgUrl(profilePicture)}
               sx={{ width: 120, height: 120, mb: 2 }}
             />
             {isEditing && (
@@ -82,10 +109,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                 Upload Picture
                 <input
                   type="file"
+                  accept=".jpg"
                   style={{ display: 'none' }}
                   onChange={(e) => {
-                    // Handle file upload
-                    console.log('File uploaded:', e.target.files);
+                    setFile(e.target.files[0]);
                   }}
                 />
               </Button>

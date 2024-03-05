@@ -36,3 +36,9 @@ export const useGetAllUsers = () =>
     const response = await axiosApi.get('user');
     return response.data;
   });
+
+export const useUserImgUpload = (opt?: MutOptions<string>) =>
+  useMutation<string, ApiServiceErr, any>(async (data) => {
+    const response = await axiosApi.post('media/upload', data);
+    return response.data;
+  }, opt);
